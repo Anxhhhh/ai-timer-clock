@@ -1,78 +1,215 @@
-# AI-Powered Timer App
+# MindTick
+> Focus Smarter. Finish Stronger.
 
-A premium, glassmorphic focus timer app that integrates Gemini AI to provide dynamic motivational messages at specific checkpoints during a focus session, paired with Text-to-Speech (TTS).
+<div align="center">
+  <!-- Placeholder for App UI Screenshots or Banner -->
+  <img src="https://via.placeholder.com/800x200.png?text=MindTick+Banner" alt="MindTick Banner" width="100%">
+</div>
 
-## Project Overview
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## PROJECT OVERVIEW
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-This app goes beyond a simple countdown timer by acting as an AI productivity assistant. It allows users to:
-- Select preset durations or create highly customized timers.
-- Receive AI-recommended session parameters based on task inputs.
-- Automatically receive contextually aware voice motivation exactly when they need it: halfway through, at the 10-second mark, and upon completion.
-- View productivity metrics on a dedicated Analytics Dashboard.
-- Customize app settings via a unified Settings Dashboard.
+**MindTick** is a modern, AI-powered focus timer built with Flutter and Google's Gemini AI. 
 
-## Setup Instructions
+Designed to solve the modern productivity problem of digital distraction and burnout, MindTick provides the structure and encouragement needed to stay on track. The application combines a rigorous focus timer with dynamically generated AI motivation, helping users sustain deep work without losing momentum. 
 
-1. Ensure you have the Flutter SDK (>=3.12.0) installed.
-2. Clone this repository.
-3. Run `flutter pub get` to download all necessary dependencies.
-4. Set up your `.env` file (see Environment Variables below).
-5. Ensure you have an active emulator or connected device.
-6. Run `flutter run`.
+By leveraging advanced asynchronous architecture, MindTick ensures precise timekeeping while delivering rich features like Text-to-Speech (TTS) announcements, comprehensive session analytics, and custom timer creation.
 
-## Environment Variables
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FEATURES
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-This project uses the `flutter_dotenv` package to securely load the Gemini API key.
+- ✓ **Focus Sessions**
+- ✓ **Custom Timer Creation**
+- ✓ **AI-Powered Motivation**
+- ✓ **Gemini Integration**
+- ✓ **Text-to-Speech Announcements**
+- ✓ **Analytics Dashboard**
+- ✓ **Session Tracking**
+- ✓ **Completion Statistics**
+- ✓ **Pause / Resume Support**
+- ✓ **Offline Fallback Messages**
+- ✓ **Dark Theme UI**
+- ✓ **Responsive Design**
+- ✓ **Non-Blocking Timer Logic**
 
-1. Create a file named `.env` in the root directory of the project.
-2. Add your Gemini API key in the following format:
-   ```env
-   GEMINI_API_KEY=your_api_key_here
-   ```
-*(A `.env.example` file is included in the repository for reference).*
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## TECH STACK
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## APK Build Instructions
+**Frontend:**
+- Flutter
+- Dart
 
-To build a release APK for Android, run the following command in your terminal from the root directory:
+**AI:**
+- Google Gemini API
+
+**State Management:**
+- Provider
+
+**Storage:**
+- SharedPreferences
+
+**Speech:**
+- `flutter_tts`
+
+**Visualization:**
+- `fl_chart`
+
+**UI:**
+- Material Design 3
+- Google Fonts
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## PROJECT ARCHITECTURE
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+```text
+User
+  ↓
+MindTick App
+  ↓
+Timer Engine
+  ↓
+Checkpoint Manager
+  ↓
+Gemini Service
+  ↓
+Response Processor
+  ↓
+Text-To-Speech Service
+  ↓
+User Feedback
+```
+
+### Layer Responsibilities
+
+- **UI Layer**: Handles rendering of the user interface, responding to state changes, and capturing user interactions seamlessly using Material Design 3.
+- **Timer Layer**: Manages the core countdown logic, guaranteeing accurate timekeeping independent of UI frames or network latency.
+- **AI Layer**: Interfaces with the Google Gemini API to dynamically generate context-aware motivational content during active sessions.
+- **TTS Layer**: Converts text responses into spoken audio using native text-to-speech engine capabilities.
+- **Analytics Layer**: Aggregates, processes, and prepares session data for visualization in the analytics dashboard.
+- **Persistence Layer**: Manages local data storage to securely save analytics, session history, and user settings across app launches.
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## ASYNC ARCHITECTURE
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A core requirement for MindTick is ensuring precise timing while simultaneously handling network requests and audio playback. This is achieved through a strict **non-blocking asynchronous architecture**.
+
+- **Future-Based Execution**: Network requests to Gemini and TTS generation utilize Dart's `Future` and `async/await` patterns to avoid blocking the main isolate.
+- **Background Processing**: The countdown timer operates independently from the Gemini API requests. A UI ticker updates the clock seamlessly, completely decoupled from data-fetching delays.
+- **Non-Blocking Architecture**: When a timer reaches a specific milestone (checkpoint event), it triggers asynchronous tasks without pausing or delaying the countdown clock. The UI remains fully responsive.
+- **Independent TTS**: Text-to-Speech execution runs entirely decoupled from timer updates, ensuring announcements play smoothly without stalling the visual countdown.
+- **Fallback Handling**: If asynchronous tasks fail or time out, the system falls back to localized synchronous operations without interrupting the user's focus session.
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## AI IMPLEMENTATION
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MindTick integrates the **Google Gemini API** to deliver context-aware, highly personalized motivational messages. As the user reaches predefined focus milestones, Gemini evaluates the context and generates tailored encouragement.
+
+To guarantee an uninterrupted experience, robust fallback mechanics handle all edge cases:
+- **Internet is Unavailable**: Instantly shifts to local, on-device motivational quotes.
+- **Gemini Fails**: Graceful degradation to pre-configured positive affirmations.
+- **Rate Limits Occur**: Intelligent detection of API limits triggers cached fallback messages.
+- **Timeouts Occur**: If the API response exceeds the threshold, the request is abandoned in favor of local messaging to prevent latency.
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## TEXT TO SPEECH
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Generated AI messages are brought to life via the `flutter_tts` package, delivering hands-free audio announcements.
+- The conversion of text to speech runs completely asynchronously.
+- A speech lifecycle management queue actively prevents overlapping announcements, ensuring that rapid consecutive checkpoint triggers are handled cleanly.
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## ANALYTICS
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MindTick tracks and persists vital productivity metrics locally using `SharedPreferences`:
+- **Session Count**: The total number of focus sessions initiated.
+- **Total Focus Time**: The cumulative number of minutes spent in focus mode.
+- **Completion Rate**: The percentage of sessions successfully completed versus paused/cancelled.
+- **Focus Statistics**: Visual charts rendering daily and weekly trends.
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## AI GENERATED CODE CHALLENGES
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+During development, we encountered and resolved several complex challenges relating to AI generation and real-time execution:
+
+**1. Initial AI-generated implementation risked blocking timer execution while waiting for Gemini responses.**
+* **Fix**: Refactored checkpoint processing to utilize strict asynchronous execution. Decoupled the UI ticker from the AI service layer, ensuring precise timekeeping regardless of network latency.
+
+**2. Gemini API failures could interrupt user experience.**
+* **Fix**: Implemented robust fallback motivational messages. If a network timeout, error, or rate limit occurs, the application instantly serves a local quote without exposing errors to the user or halting the session.
+
+**3. Text-to-Speech announcements could overlap.**
+* **Fix**: Added speech lifecycle management. Engineered a concurrency lock and queue system for the TTS engine to handle consecutive speech requests systematically.
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## INSTALLATION
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Anxhhhh/ai-timer-clock.git
+cd ai-timer-clock
+```
+
+2. Get Flutter dependencies:
+```bash
+flutter pub get
+```
+
+3. Create the environment configuration file:
+Create a `.env` file in the project root.
+
+4. Run the application:
+```bash
+flutter run
+```
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## ENVIRONMENT VARIABLES
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The project requires a Google Gemini API key to run fully. Add the following to your `.env` file:
+
+```env
+GEMINI_API_KEY=YOUR_API_KEY
+```
+
+> [!WARNING]
+> API keys should **never** be committed to version control. Make sure your `.env` file is added to your `.gitignore`.
+
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## BUILD INSTRUCTIONS
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+To compile a production-ready application for Android:
 
 ```bash
 flutter build apk --release
 ```
 
-The compiled APK will be located at:
+The output APK will be located at:
 `build/app/outputs/flutter-apk/app-release.apk`
 
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FUTURE IMPROVEMENTS
+## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- **Cloud Sync**
+- **User Accounts**
+- **AI Productivity Insights**
+- **Session History**
+- **Notifications**
+- **Cross Device Sync**
+
 ---
-
-## Internship Assignment Answers
-
-### 1. How did you ensure the timer never froze during Gemini API calls?
-
-To prevent the timer from freezing, I implemented a strict non-blocking asynchronous architecture. The `_onTick` method in the `FocusTimerController` (which runs every 1 second) is completely synchronous. 
-
-Instead of pausing the tick loop to `await` the Gemini response, the `_onTick` method simply evaluates the state (e.g., checking if `remainingSeconds == 10`) and dispatches a fire-and-forget asynchronous function (`_handleCheckpoint`). 
-
-```dart
-// Checkpoint detected synchronously
-if (remaining == 10 && !_tenSecondsTriggered) {
-  _tenSecondsTriggered = true;
-  _handleCheckpoint('10seconds'); // Fired asynchronously without `await`
-}
-```
-
-The `_handleCheckpoint` method then independently calls the `GeminiService` and the `TtsService`. Because Dart handles `async` methods by scheduling them on the microtask and event queues, the synchronous timer execution immediately continues on its scheduled 1-second interval without waiting for network I/O. Furthermore, the `GeminiService` includes a `.timeout` duration to ensure the background task doesn't hang indefinitely if the network is poor.
-
-### 2. What was the biggest AI-generated code issue that required manual fixing?
-
-The most significant AI-generated issue was related to Flutter's state lifecycle and the use of the `late` keyword for the `FocusTimerController`. 
-
-When iterating rapidly using Flutter's Hot Reload, the AI provided a solution where `_controller` was defined as `late` and initialized inside `initState()`. However, because `initState()` is only called once when a widget is inserted into the tree, applying a Hot Reload on a live widget preserved the `State` object but did not run `initState()` again. This resulted in a persistent `LateInitializationError` because the new `late` field was accessed in the `build()` method before it was ever initialized.
-
-To manually fix this, I refactored the controller to use inline lazy initialization:
-
-```dart
-late final FocusTimerController _controller = FocusTimerController(...);
-```
-
-By initializing it directly at the declaration site, Dart's lazy evaluation guarantees the controller is instantiated the exact moment it is first accessed (e.g., during the first `build` pass after the Hot Reload), entirely eliminating the crash without requiring the developer to perform a full Hot Restart.
-# ai-timer-clock
+<div align="center">
+  <i>Built with Flutter & Google Gemini</i>
+</div>
