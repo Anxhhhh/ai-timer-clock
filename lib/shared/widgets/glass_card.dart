@@ -47,7 +47,7 @@ class GlassCard extends StatelessWidget {
             borderRadius: radius,
             border: gradientBorder ? null : Border.all(color: border, width: 1),
             // Top-edge highlight for light-source realism
-            gradient: LinearGradient(
+            gradient: gradientBorder ? null : LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [

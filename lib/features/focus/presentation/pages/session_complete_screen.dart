@@ -270,7 +270,7 @@ class SessionCompleteScreen extends StatelessWidget {
       crossAxisCount: 2,
       crossAxisSpacing: AppDimensions.spaceMD,
       mainAxisSpacing: AppDimensions.spaceMD,
-      childAspectRatio: 1.5,
+      childAspectRatio: 1.3,
       children: stats.map((s) => _StatCard(item: s)).toList(),
     );
   }

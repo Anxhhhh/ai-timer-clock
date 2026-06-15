@@ -101,19 +101,9 @@ class _CustomTimerModalState extends State<_CustomTimerModal> {
         color: AppColors.surface,
         borderRadius:
             const BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXL)),
-        border: Border(
-          top: BorderSide(
-            color: AppColors.accent.withValues(alpha: 0.3),
-            width: 2,
-          ),
-          left: BorderSide(
-            color: AppColors.muted.withValues(alpha: 0.15),
-            width: 1,
-          ),
-          right: BorderSide(
-            color: AppColors.muted.withValues(alpha: 0.15),
-            width: 1,
-          ),
+        border: Border.all(
+          color: AppColors.muted.withValues(alpha: 0.15),
+          width: 1,
         ),
       ),
       child: SafeArea(
@@ -208,10 +198,7 @@ class _CustomTimerModalState extends State<_CustomTimerModal> {
           ),
         ),
       ),
-    )
-        .animate()
-        .slideY(begin: 0.3, end: 0, duration: 350.ms, curve: Curves.easeOutCubic)
-        .fadeIn(duration: 250.ms);
+    );
   }
 
   Widget _buildPickerRow() {
@@ -378,11 +365,9 @@ class _WheelPicker extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.accent.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.symmetric(
-                    horizontal: BorderSide(
-                      color: AppColors.accent.withValues(alpha: 0.2),
-                      width: 1,
-                    ),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.2),
+                    width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
