@@ -135,19 +135,14 @@ MindTick tracks and persists vital productivity metrics locally using `SharedPre
 - **Focus Statistics**: Visual charts rendering daily and weekly trends.
 
 ## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-## AI GENERATED CODE CHALLENGES
+## ASSIGNMENT QUESTIONS
 ## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-During development, we encountered and resolved several complex challenges relating to AI generation and real-time execution:
+**How did you structure the API calls to ensure the timer didn't freeze?**
+We structured the Gemini API network requests using Dart's non-blocking `Future` and `async/await` patterns. By completely decoupling the timer's `Ticker` engine from the AI service layer, the countdown clock updates independently on the main UI thread. Checkpoint events trigger API requests asynchronously in the background, ensuring that network latency or timeouts never stall the timer's visual progress.
 
-**1. Initial AI-generated implementation risked blocking timer execution while waiting for Gemini responses.**
-* **Fix**: Refactored checkpoint processing to utilize strict asynchronous execution. Decoupled the UI ticker from the AI service layer, ensuring precise timekeeping regardless of network latency.
-
-**2. Gemini API failures could interrupt user experience.**
-* **Fix**: Implemented robust fallback motivational messages. If a network timeout, error, or rate limit occurs, the application instantly serves a local quote without exposing errors to the user or halting the session.
-
-**3. Text-to-Speech announcements could overlap.**
-* **Fix**: Added speech lifecycle management. Engineered a concurrency lock and queue system for the TTS engine to handle consecutive speech requests systematically.
+**If you used an AI assistant to help write this, what was the biggest mistake the AI made that you had to fix manually?**
+The biggest mistake the AI made was generating a `BoxDecoration` that combined a non-uniform border (`Border.symmetric`) with a `borderRadius`. This is unsupported in Flutter and caused a severe rendering exception (`A borderRadius can only be given on borders with uniform colors`), which completely prevented the custom timer modal from painting on the screen. I had to manually diagnose the crash from the debug logs and refactor the code to use uniform borders (`Border.all`) to restore the UI.
 
 ## ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ## INSTALLATION
