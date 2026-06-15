@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 
-/// A large amber-gradient primary action button.
-class AccentButton extends StatelessWidget {
+/// A large amber-gradient primary action button with press-down animation.
+class AccentButton extends StatefulWidget {
   const AccentButton({
     super.key,
     required this.label,
@@ -21,61 +21,105 @@ class AccentButton extends StatelessWidget {
   final double width;
 
   @override
+  State<AccentButton> createState() => _AccentButtonState();
+}
+
+class _AccentButtonState extends State<AccentButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pressCtrl;
+  late final Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pressCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 180),
+    );
+    _scaleAnim = Tween(begin: 1.0, end: 0.965).animate(
+      CurvedAnimation(parent: _pressCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pressCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: 56,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: AppColors.accentGradient,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.accent.withValues(alpha: 0.35),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onPressed,
+    return ScaleTransition(
+      scale: _scaleAnim,
+      child: SizedBox(
+        width: widget.width,
+        height: 56,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: AppColors.accentGradient,
             borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-            splashColor: Colors.white.withValues(alpha: 0.15),
-            child: Center(
-              child: isLoading
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation(AppColors.background),
-                      ),
-                    )
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (icon != null) ...[
-                          Icon(icon, color: AppColors.background, size: 20),
-                          const SizedBox(width: 8),
-                        ],
-                        Text(
-                          label,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.background,
-                            letterSpacing: 0.2,
-                          ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.accent.withValues(alpha: 0.35),
+                blurRadius: 22,
+                offset: const Offset(0, 6),
+              ),
+              BoxShadow(
+                color: AppColors.accent.withValues(alpha: 0.12),
+                blurRadius: 40,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTapDown: (_) => _pressCtrl.forward(),
+              onTapUp: (_) {
+                _pressCtrl.reverse();
+                widget.onPressed();
+              },
+              onTapCancel: () => _pressCtrl.reverse(),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+              splashColor: Colors.white.withValues(alpha: 0.15),
+              child: Center(
+                child: widget.isLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor:
+                              AlwaysStoppedAnimation(AppColors.background),
                         ),
-                      ],
-                    ),
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.icon != null) ...[
+                            Icon(widget.icon,
+                                color: AppColors.background, size: 20),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            widget.label,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.background,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
         ),
       ),
-    ).animate().scaleXY(begin: 0.95, end: 1.0, duration: 350.ms, curve: Curves.easeOut);
+    ).animate().scaleXY(
+        begin: 0.95, end: 1.0, duration: 350.ms, curve: Curves.easeOut);
   }
 }
 

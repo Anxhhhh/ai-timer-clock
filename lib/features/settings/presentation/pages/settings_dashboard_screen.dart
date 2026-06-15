@@ -19,13 +19,19 @@ class SettingsDashboardScreen extends StatelessWidget {
           _SettingItem(
             icon: Icons.palette_outlined,
             label: 'Theme',
+            iconColor: AppColors.iconPalette,
             trailing: settings.isDarkMode ? 'Dark' : 'Light',
+            hasSwitch: true,
+            switchValue: settings.isDarkMode,
             onTap: settings.toggleTheme,
           ),
           _SettingItem(
             icon: Icons.notifications_outlined,
             label: 'Notifications',
+            iconColor: AppColors.iconAmber,
             trailing: settings.notificationsEnabled ? 'On' : 'Off',
+            hasSwitch: true,
+            switchValue: settings.notificationsEnabled,
             onTap: settings.toggleNotifications,
           ),
         ],
@@ -33,15 +39,31 @@ class SettingsDashboardScreen extends StatelessWidget {
       _SettingSection(
         title: 'AI & Focus',
         items: [
-          _SettingItem(icon: Icons.auto_awesome_outlined, label: 'AI Preferences'),
-          _SettingItem(icon: Icons.track_changes_outlined, label: 'Focus Goals'),
+          _SettingItem(
+            icon: Icons.auto_awesome_outlined,
+            label: 'AI Preferences',
+            iconColor: AppColors.iconBlue,
+          ),
+          _SettingItem(
+            icon: Icons.track_changes_outlined,
+            label: 'Focus Goals',
+            iconColor: AppColors.iconTeal,
+          ),
         ],
       ),
       _SettingSection(
         title: 'Account',
         items: [
-          _SettingItem(icon: Icons.lock_outline, label: 'Privacy'),
-          _SettingItem(icon: Icons.info_outline, label: 'About'),
+          _SettingItem(
+            icon: Icons.lock_outline,
+            label: 'Privacy',
+            iconColor: AppColors.iconRose,
+          ),
+          _SettingItem(
+            icon: Icons.info_outline,
+            label: 'About',
+            iconColor: AppColors.iconGreen,
+          ),
         ],
       ),
       _SettingSection(
@@ -50,8 +72,10 @@ class SettingsDashboardScreen extends StatelessWidget {
           _SettingItem(
             icon: Icons.bug_report_outlined,
             label: 'TTS & Gemini Debug',
+            iconColor: AppColors.error,
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DebugTtsScreen()));
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const DebugTtsScreen()));
             },
           ),
         ],
@@ -72,7 +96,8 @@ class SettingsDashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Settings', style: Theme.of(context).textTheme.headlineMedium)
+              Text('Settings',
+                      style: Theme.of(context).textTheme.headlineMedium)
                   .animate()
                   .fadeIn(duration: 350.ms)
                   .slideY(begin: -0.2),
@@ -83,7 +108,8 @@ class SettingsDashboardScreen extends StatelessWidget {
                   .slideY(begin: 0.1),
               const SizedBox(height: AppDimensions.spaceLG),
               ..._buildSections(context).asMap().entries.map((entry) {
-                final delay = Duration(milliseconds: 200 + entry.key * 100);
+                final delay =
+                    Duration(milliseconds: 200 + entry.key * 100);
                 return _buildSection(context, entry.value)
                     .animate()
                     .fadeIn(delay: delay, duration: 400.ms)
@@ -93,7 +119,8 @@ class SettingsDashboardScreen extends StatelessWidget {
               _buildLogoutButton(context)
                   .animate()
                   .fadeIn(delay: 600.ms, duration: 400.ms),
-              const SizedBox(height: AppDimensions.spaceMD),
+              // Extra padding for floating nav
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -106,27 +133,47 @@ class SettingsDashboardScreen extends StatelessWidget {
     return GlassCard(
       child: Row(
         children: [
-          // Avatar
+          // Avatar with gradient ring
           Container(
-            width: 64,
-            height: 64,
+            padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: AppColors.accentGradient,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.accent.withValues(alpha: 0.35),
-                  blurRadius: 16,
+                  color: AppColors.accent.withValues(alpha: 0.3),
+                  blurRadius: 18,
                 ),
               ],
             ),
-            child: const Center(
-              child: Text(
-                'A',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.background,
+            child: Container(
+              width: 58,
+              height: 58,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.surface,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.accent.withValues(alpha: 0.2),
+                      AppColors.accentDark.withValues(alpha: 0.1),
+                    ],
+                  ),
+                ),
+                child: const Center(
+                  child: Text(
+                    'A',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.accent,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -136,21 +183,29 @@ class SettingsDashboardScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Ansh', style: tt.headlineMedium?.copyWith(fontSize: 20)),
-                const SizedBox(height: 4),
+                Text('Ansh',
+                    style: tt.headlineMedium?.copyWith(fontSize: 20)),
+                const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF8B5CF6), Color(0xFF3B82F6)],
-                    ),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                    gradient: AppColors.geminiGradient,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusFull),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8B5CF6)
+                            .withValues(alpha: 0.25),
+                        blurRadius: 8,
+                      ),
+                    ],
                   ),
                   child: const Text(
                     'Premium Member',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                   ),
@@ -158,9 +213,14 @@ class SettingsDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, color: AppColors.secondaryText, size: 20),
-            onPressed: () {},
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.muted.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.edit_outlined,
+                color: AppColors.secondaryText, size: 18),
           ),
         ],
       ),
@@ -178,7 +238,8 @@ class SettingsDashboardScreen extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, bottom: 8),
             child: Text(
               section.title.toUpperCase(),
-              style: tt.labelMedium?.copyWith(letterSpacing: 1.2, fontSize: 11),
+              style: tt.labelMedium
+                  ?.copyWith(letterSpacing: 1.2, fontSize: 11),
             ),
           ),
           GlassCard(
@@ -193,8 +254,8 @@ class SettingsDashboardScreen extends StatelessWidget {
                     if (i < section.items.length - 1)
                       Divider(
                         height: 1,
-                        indent: 52,
-                        color: AppColors.muted.withValues(alpha: 0.3),
+                        indent: 56,
+                        color: AppColors.muted.withValues(alpha: 0.2),
                       ),
                   ],
                 );
@@ -212,15 +273,18 @@ class SettingsDashboardScreen extends StatelessWidget {
       height: 52,
       child: OutlinedButton.icon(
         onPressed: () {},
-        icon: const Icon(Icons.logout_rounded, color: AppColors.error, size: 18),
+        icon: const Icon(Icons.logout_rounded,
+            color: AppColors.error, size: 18),
         label: const Text('Log Out'),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.error,
-          side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
+          side: BorderSide(color: AppColors.error.withValues(alpha: 0.4)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.radiusFull),
           ),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -236,11 +300,22 @@ class _SettingSection {
 }
 
 class _SettingItem {
-  const _SettingItem({required this.icon, required this.label, this.trailing, this.onTap});
+  const _SettingItem({
+    required this.icon,
+    required this.label,
+    this.iconColor = AppColors.secondaryText,
+    this.trailing,
+    this.onTap,
+    this.hasSwitch = false,
+    this.switchValue = false,
+  });
   final IconData icon;
   final String label;
+  final Color iconColor;
   final String? trailing;
   final VoidCallback? onTap;
+  final bool hasSwitch;
+  final bool switchValue;
 }
 
 class _SettingTile extends StatelessWidget {
@@ -260,26 +335,48 @@ class _SettingTile extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Colored icon background
             Container(
-              width: 36,
-              height: 36,
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
-                color: AppColors.muted.withValues(alpha: 0.25),
+                color: item.iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(item.icon, color: AppColors.secondaryText, size: 18),
+              child: Icon(item.icon, color: item.iconColor, size: 18),
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Text(item.label, style: tt.bodyLarge?.copyWith(fontSize: 15)),
+              child: Text(item.label,
+                  style: tt.bodyLarge?.copyWith(fontSize: 15)),
             ),
-            if (item.trailing != null)
+            if (item.hasSwitch)
+              SizedBox(
+                height: 26,
+                child: Switch.adaptive(
+                  value: item.switchValue,
+                  onChanged: (_) => item.onTap?.call(),
+                  activeThumbColor: AppColors.accent,
+                  activeTrackColor:
+                      AppColors.accent.withValues(alpha: 0.3),
+                  inactiveThumbColor: AppColors.muted,
+                  inactiveTrackColor:
+                      AppColors.muted.withValues(alpha: 0.2),
+                ),
+              )
+            else if (item.trailing != null) ...[
               Text(
                 item.trailing!,
-                style: tt.bodyMedium?.copyWith(color: AppColors.accent, fontSize: 13),
+                style: tt.bodyMedium?.copyWith(
+                    color: AppColors.accent, fontSize: 13),
               ),
-            const SizedBox(width: 6),
-            const Icon(Icons.chevron_right, color: AppColors.muted, size: 18),
+              const SizedBox(width: 6),
+              const Icon(Icons.chevron_right,
+                  color: AppColors.muted, size: 18),
+            ] else ...[
+              const Icon(Icons.chevron_right,
+                  color: AppColors.muted, size: 18),
+            ],
           ],
         ),
       ),

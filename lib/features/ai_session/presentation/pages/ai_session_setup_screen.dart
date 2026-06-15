@@ -21,7 +21,12 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
   bool _hasRecommendation = false;
   final Set<String> _selectedTags = {'Deep Focus'};
 
-  static const _tags = ['Deep Focus', 'No Interruptions', 'Light Work', 'Creative'];
+  static const _tags = [
+    _TagData('Deep Focus', Icons.psychology_outlined),
+    _TagData('No Interruptions', Icons.do_not_disturb_on_outlined),
+    _TagData('Light Work', Icons.wb_sunny_outlined),
+    _TagData('Creative', Icons.palette_outlined),
+  ];
   static const _durations = ['15 Minutes', '25 Minutes', '45 Minutes', '60 Minutes'];
   String _selectedDuration = '45 Minutes';
 
@@ -101,7 +106,8 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
               const SizedBox(height: AppDimensions.spaceXL),
               Text(
                 'What would you like\nto work on?',
-                style: tt.displayMedium?.copyWith(fontSize: 26, height: 1.25),
+                style: tt.displayMedium
+                    ?.copyWith(fontSize: 26, height: 1.25),
               )
                   .animate()
                   .fadeIn(delay: 100.ms, duration: 400.ms)
@@ -133,7 +139,8 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
                   onPressed: _startFocusSession,
                 ).animate().fadeIn(delay: 400.ms, duration: 400.ms),
               ],
-              const SizedBox(height: AppDimensions.spaceMD),
+              // Extra padding for floating nav
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -155,17 +162,38 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
   }
 
   Widget _buildInput(BuildContext context) {
-    return TextField(
-      controller: _taskController,
-      onSubmitted: _onTaskSubmitted,
-      maxLines: 3,
-      minLines: 2,
-      style: Theme.of(context).textTheme.bodyLarge,
-      decoration: InputDecoration(
-        hintText: 'e.g. Write the project proposal, study algorithms...',
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.send_rounded, color: AppColors.accent),
-          onPressed: () => _onTaskSubmitted(_taskController.text),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.accent.withValues(alpha: 0.06),
+            blurRadius: 20,
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _taskController,
+        onSubmitted: _onTaskSubmitted,
+        maxLines: 3,
+        minLines: 2,
+        style: Theme.of(context).textTheme.bodyLarge,
+        decoration: InputDecoration(
+          hintText:
+              'e.g. Write the project proposal, study algorithms...',
+          suffixIcon: Container(
+            margin: const EdgeInsets.only(right: 4),
+            decoration: BoxDecoration(
+              color: AppColors.accent.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.send_rounded,
+                  color: AppColors.accent, size: 20),
+              onPressed: () => _onTaskSubmitted(_taskController.text),
+            ),
+          ),
         ),
       ),
     );
@@ -173,14 +201,39 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
 
   Widget _buildThinkingState() {
     return GlassCard(
+      gradientBorder: true,
       child: Row(
         children: [
-          const SizedBox(
-            width: 20,
+          // Animated pulsing dots
+          SizedBox(
+            width: 36,
             height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(AppColors.accent),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (i) {
+                return Container(
+                  width: 6,
+                  height: 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFFA78BFA),
+                  ),
+                )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .scaleXY(
+                      begin: 0.5,
+                      end: 1.0,
+                      delay: Duration(milliseconds: i * 180),
+                      duration: 500.ms,
+                      curve: Curves.easeInOut,
+                    )
+                    .fadeIn(
+                      begin: 0.4,
+                      delay: Duration(milliseconds: i * 180),
+                      duration: 500.ms,
+                    );
+              }),
             ),
           ),
           const SizedBox(width: 14),
@@ -193,7 +246,10 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
                   style: Theme.of(context)
                       .textTheme
                       .headlineSmall
-                      ?.copyWith(fontSize: 14),
+                      ?.copyWith(
+                        fontSize: 14,
+                        color: const Color(0xFFA78BFA),
+                      ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -217,17 +273,28 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, color: AppColors.accent, size: 18),
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.auto_awesome,
+                    color: AppColors.accent, size: 16),
+              ),
               const SizedBox(width: 8),
               Text(
                 'Gemini Recommends',
                 style: tt.labelMedium?.copyWith(
-                    color: AppColors.accent, fontSize: 12, letterSpacing: 0.5),
+                    color: AppColors.accent,
+                    fontSize: 12,
+                    letterSpacing: 0.5),
               ),
             ],
           ),
           const SizedBox(height: AppDimensions.spaceSM),
-          Text('Session Duration', style: tt.headlineSmall?.copyWith(fontSize: 15)),
+          Text('Session Duration',
+              style: tt.headlineSmall?.copyWith(fontSize: 15)),
           const SizedBox(height: AppDimensions.spaceMD),
           Wrap(
             spacing: 8,
@@ -236,27 +303,41 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
               return GestureDetector(
                 onTap: () => setState(() => _selectedDuration = d),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
                   margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 9),
                   decoration: BoxDecoration(
                     color: selected
                         ? AppColors.accent.withValues(alpha: 0.15)
                         : AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                    borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusFull),
                     border: Border.all(
                       color: selected
                           ? AppColors.accent
-                          : AppColors.muted.withValues(alpha: 0.4),
+                          : AppColors.muted.withValues(alpha: 0.3),
                       width: selected ? 1.5 : 1,
                     ),
+                    boxShadow: selected
+                        ? [
+                            BoxShadow(
+                              color: AppColors.accent
+                                  .withValues(alpha: 0.18),
+                              blurRadius: 10,
+                            )
+                          ]
+                        : null,
                   ),
                   child: Text(
                     d,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: selected ? AppColors.accent : AppColors.secondaryText,
+                      color: selected
+                          ? AppColors.accent
+                          : AppColors.secondaryText,
                     ),
                   ),
                 ),
@@ -268,7 +349,9 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
             Text(
               _recommendation!.reason,
               style: tt.bodyMedium?.copyWith(
-                  height: 1.5, color: AppColors.secondaryText, fontSize: 12),
+                  height: 1.5,
+                  color: AppColors.secondaryText,
+                  fontSize: 12),
             ),
           ],
         ],
@@ -282,44 +365,74 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
       children: [
         Text(
           'Focus Type',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontSize: 15),
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall
+              ?.copyWith(fontSize: 15),
         ),
-        const SizedBox(height: AppDimensions.spaceSM),
+        const SizedBox(height: AppDimensions.spaceSM + 2),
         Wrap(
           spacing: 8,
-          runSpacing: 8,
+          runSpacing: 10,
           children: _tags.map((tag) {
-            final selected = _selectedTags.contains(tag);
+            final selected = _selectedTags.contains(tag.label);
             return GestureDetector(
               onTap: () => setState(() {
                 if (selected) {
-                  _selectedTags.remove(tag);
+                  _selectedTags.remove(tag.label);
                 } else {
-                  _selectedTags.add(tag);
+                  _selectedTags.add(tag.label);
                 }
               }),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 9),
                 decoration: BoxDecoration(
                   color: selected
                       ? AppColors.accent.withValues(alpha: 0.12)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusFull),
                   border: Border.all(
                     color: selected
                         ? AppColors.accent
-                        : AppColors.muted.withValues(alpha: 0.5),
-                    width: 1.2,
+                        : AppColors.muted.withValues(alpha: 0.4),
+                    width: selected ? 1.5 : 1,
                   ),
+                  boxShadow: selected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.accent
+                                .withValues(alpha: 0.15),
+                            blurRadius: 8,
+                          )
+                        ]
+                      : null,
                 ),
-                child: Text(
-                  tag,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: selected ? AppColors.accent : AppColors.secondaryText,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      tag.icon,
+                      size: 14,
+                      color: selected
+                          ? AppColors.accent
+                          : AppColors.secondaryText,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      tag.label,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: selected
+                            ? AppColors.accent
+                            : AppColors.secondaryText,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -328,4 +441,10 @@ class _AiSessionSetupScreenState extends State<AiSessionSetupScreen> {
       ],
     );
   }
+}
+
+class _TagData {
+  const _TagData(this.label, this.icon);
+  final String label;
+  final IconData icon;
 }

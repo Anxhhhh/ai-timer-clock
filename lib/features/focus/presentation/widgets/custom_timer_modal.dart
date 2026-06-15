@@ -101,9 +101,19 @@ class _CustomTimerModalState extends State<_CustomTimerModal> {
         color: AppColors.surface,
         borderRadius:
             const BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXL)),
-        border: Border.all(
-          color: AppColors.muted.withValues(alpha: 0.25),
-          width: 1,
+        border: Border(
+          top: BorderSide(
+            color: AppColors.accent.withValues(alpha: 0.3),
+            width: 2,
+          ),
+          left: BorderSide(
+            color: AppColors.muted.withValues(alpha: 0.15),
+            width: 1,
+          ),
+          right: BorderSide(
+            color: AppColors.muted.withValues(alpha: 0.15),
+            width: 1,
+          ),
         ),
       ),
       child: SafeArea(
@@ -219,7 +229,7 @@ class _CustomTimerModalState extends State<_CustomTimerModal> {
             }),
           ),
         ),
-        _PickerSeparator(),
+        const _PickerSeparator(),
         Expanded(
           child: _WheelPicker(
             controller: _minutesCtrl,
@@ -232,7 +242,7 @@ class _CustomTimerModalState extends State<_CustomTimerModal> {
             }),
           ),
         ),
-        _PickerSeparator(),
+        const _PickerSeparator(),
         Expanded(
           child: _WheelPicker(
             controller: _secondsCtrl,
@@ -289,9 +299,10 @@ class _QuickPresets extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => onSelect(min),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                        horizontal: 16, vertical: 9),
                     decoration: BoxDecoration(
                       color: selected
                           ? AppColors.accent.withValues(alpha: 0.15)
@@ -301,7 +312,7 @@ class _QuickPresets extends StatelessWidget {
                       border: Border.all(
                         color: selected
                             ? AppColors.accent
-                            : AppColors.muted.withValues(alpha: 0.35),
+                            : AppColors.muted.withValues(alpha: 0.25),
                         width: selected ? 1.5 : 1,
                       ),
                       boxShadow: selected
@@ -309,7 +320,7 @@ class _QuickPresets extends StatelessWidget {
                               BoxShadow(
                                 color:
                                     AppColors.accent.withValues(alpha: 0.2),
-                                blurRadius: 8,
+                                blurRadius: 10,
                               )
                             ]
                           : null,
@@ -361,17 +372,25 @@ class _WheelPicker extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Center highlight line
+              // Center highlight band with glow
               Container(
                 height: 52,
                 decoration: BoxDecoration(
                   color: AppColors.accent.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.symmetric(
                     horizontal: BorderSide(
-                      color: AppColors.accent.withValues(alpha: 0.3),
+                      color: AppColors.accent.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.accent.withValues(alpha: 0.04),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ],
                 ),
               ),
               // Wheel
@@ -399,7 +418,7 @@ class _WheelPicker extends StatelessWidget {
                               : FontWeight.w400,
                           color: isSelected
                               ? AppColors.accent
-                              : AppColors.muted.withValues(alpha: 0.6),
+                              : AppColors.muted.withValues(alpha: 0.5),
                         ),
                         child: Text(index.toString().padLeft(2, '0')),
                       ),
@@ -468,6 +487,8 @@ class _WheelPicker extends StatelessWidget {
 }
 
 class _PickerSeparator extends StatelessWidget {
+  const _PickerSeparator();
+
   @override
   Widget build(BuildContext context) {
     return const Padding(

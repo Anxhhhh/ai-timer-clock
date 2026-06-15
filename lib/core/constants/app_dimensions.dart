@@ -24,7 +24,7 @@ abstract final class AppDimensions {
   static const double timerRingStroke = 14.0;
 
   // ── Bottom nav ────────────────────────────────────────────────
-  static const double bottomNavHeight = 64.0;
+  static const double bottomNavHeight = 72.0;
 
   // ── Icon sizes ────────────────────────────────────────────────
   static const double iconSM = 16.0;

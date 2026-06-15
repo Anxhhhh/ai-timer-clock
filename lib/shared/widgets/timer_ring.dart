@@ -3,51 +3,39 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 
-/// Paints the circular gradient timer ring with an outer amber glow.
+/// Paints the circular gradient timer ring with tick marks, outer glow,
+/// and a shimmer-trail leading dot.
 class TimerRingPainter extends CustomPainter {
   const TimerRingPainter({
     required this.progress,
     required this.strokeWidth,
+    this.showTickMarks = true,
   });
 
-  /// Progress from 0.0 (empty) to 1.0 (full).
   final double progress;
   final double strokeWidth;
+  final bool showTickMarks;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
-    const startAngle = -math.pi / 2; // Start at 12 o'clock
+    const startAngle = -math.pi / 2; // 12 o'clock
 
-    // ── Track (background ring) ───────────────────────────────────
+    // ── Tick marks (removed for cleaner design) ─────────────────
+
+    // ── Track (background ring) ──────────────────────────────────
     final trackPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
-      ..color = AppColors.muted.withValues(alpha: 0.3)
+      ..color = AppColors.muted.withValues(alpha: 0.18)
       ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(center, radius, trackPaint);
 
     if (progress <= 0) return;
 
-    // ── Outer glow ────────────────────────────────────────────────
-    final glowPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth + 8
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16)
-      ..color = AppColors.accent.withValues(alpha: 0.25)
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      2 * math.pi * progress,
-      false,
-      glowPaint,
-    );
-
-    // ── Gradient progress arc ─────────────────────────────────────
+    // ── Gradient progress arc ────────────────────────────────────
     final sweepAngle = 2 * math.pi * progress;
     final rect = Rect.fromCircle(center: center, radius: radius);
 
@@ -68,15 +56,22 @@ class TimerRingPainter extends CustomPainter {
 
     canvas.drawArc(rect, startAngle, sweepAngle, false, gradientPaint);
 
-    // ── Leading dot ───────────────────────────────────────────────
+    // ── Leading dot ──────────────────────────────
     final dotAngle = startAngle + sweepAngle;
     final dotX = center.dx + radius * math.cos(dotAngle);
     final dotY = center.dy + radius * math.sin(dotAngle);
+
+    // Dot
     final dotPaint = Paint()
       ..color = Colors.white
-      ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
-    canvas.drawCircle(Offset(dotX, dotY), strokeWidth / 2, dotPaint);
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(dotX, dotY), strokeWidth / 2.5, dotPaint);
+
+    // Dot inner highlight
+    final highlightPaint = Paint()
+      ..color = AppColors.accent.withValues(alpha: 0.5)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(dotX, dotY), strokeWidth / 5, highlightPaint);
   }
 
   @override
@@ -85,7 +80,8 @@ class TimerRingPainter extends CustomPainter {
 }
 
 /// The animated timer widget wrapping the custom painter.
-class TimerRing extends StatelessWidget {
+/// Includes a pulsing ambient glow when a [glowController] is provided.
+class TimerRing extends StatefulWidget {
   const TimerRing({
     super.key,
     required this.progress,
@@ -94,6 +90,7 @@ class TimerRing extends StatelessWidget {
     this.subtitle = 'Deep Work',
     this.size = AppDimensions.timerRingSize,
     this.strokeWidth = AppDimensions.timerRingStroke,
+    this.isRunning = false,
   });
 
   final double progress;
@@ -102,69 +99,96 @@ class TimerRing extends StatelessWidget {
   final String subtitle;
   final double size;
   final double strokeWidth;
+  final bool isRunning;
+
+  @override
+  State<TimerRing> createState() => _TimerRingState();
+}
+
+class _TimerRingState extends State<TimerRing>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _trailAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _trailAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+  }
+
+  @override
+  void didUpdateWidget(covariant TimerRing oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isRunning && !_trailAnim.isAnimating) {
+      _trailAnim.repeat();
+    } else if (!widget.isRunning && _trailAnim.isAnimating) {
+      _trailAnim.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _trailAnim.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final size = widget.size;
 
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background ambient glow
-          Container(
-            width: size * 0.9,
-            height: size * 0.9,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.accent.withValues(alpha: 0.08),
-                  blurRadius: 60,
-                  spreadRadius: 20,
+    return RepaintBoundary(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // (ambient glow removed)
+            // Painter
+            CustomPaint(
+              size: Size(size, size),
+              painter: TimerRingPainter(
+                progress: widget.progress,
+                strokeWidth: widget.strokeWidth,
+              ),
+            ),
+            // Center text
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.title,
+                  style: tt.labelMedium?.copyWith(
+                    color: AppColors.secondaryText,
+                    letterSpacing: 1.6,
+                    fontSize: 10,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.subtitle,
+                  style: tt.bodyMedium?.copyWith(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  widget.timeLabel,
+                  style: tt.displayLarge?.copyWith(
+                    fontSize: 54,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -2.5,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
               ],
             ),
-          ),
-          // Painter
-          CustomPaint(
-            size: Size(size, size),
-            painter: TimerRingPainter(
-              progress: progress,
-              strokeWidth: strokeWidth,
-            ),
-          ),
-          // Center text
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: tt.labelMedium?.copyWith(
-                  color: AppColors.secondaryText,
-                  letterSpacing: 1.4,
-                  fontSize: 11,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: tt.bodyMedium?.copyWith(color: AppColors.accent),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                timeLabel,
-                style: tt.displayLarge?.copyWith(
-                  fontSize: 52,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -2,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

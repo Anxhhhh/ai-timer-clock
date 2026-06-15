@@ -27,7 +27,7 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
 
@@ -55,7 +55,7 @@ class AiTimerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Focus AI Timer',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       // Start on Focus screen (index=0 since we swapped them) so the timer is immediately visible.
       home: const BottomNavShell(initialIndex: 0),
     );

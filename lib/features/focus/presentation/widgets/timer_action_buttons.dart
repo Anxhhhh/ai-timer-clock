@@ -26,7 +26,11 @@ class TimerActionButtons extends StatelessWidget {
     return Column(
       children: [
         // Primary action
-        _PrimaryButton(state: state, onStart: onStart, onPause: onPause, onResume: onResume),
+        _PrimaryButton(
+            state: state,
+            onStart: onStart,
+            onPause: onPause,
+            onResume: onResume),
         const SizedBox(height: AppDimensions.spaceMD),
         // Reset — always visible except idle
         if (state != TimerState.idle)
@@ -41,7 +45,7 @@ class TimerActionButtons extends StatelessWidget {
 
 // ── Primary button ─────────────────────────────────────────────────────────────
 
-class _PrimaryButton extends StatelessWidget {
+class _PrimaryButton extends StatefulWidget {
   const _PrimaryButton({
     required this.state,
     required this.onStart,
@@ -55,80 +59,128 @@ class _PrimaryButton extends StatelessWidget {
   final VoidCallback onResume;
 
   @override
-  Widget build(BuildContext context) {
-    final isPaused = state == TimerState.paused;
-    final isCompleted = state == TimerState.completed;
+  State<_PrimaryButton> createState() => _PrimaryButtonState();
+}
 
-    final label = switch (state) {
+class _PrimaryButtonState extends State<_PrimaryButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pressCtrl;
+  late final Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pressCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 180),
+    );
+    _scaleAnim = Tween(begin: 1.0, end: 0.965).animate(
+      CurvedAnimation(parent: _pressCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pressCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isPaused = widget.state == TimerState.paused;
+    final isCompleted = widget.state == TimerState.completed;
+
+    final label = switch (widget.state) {
       TimerState.running => 'Pause Session',
       TimerState.paused => 'Resume Session',
       TimerState.completed => 'Session Complete',
       TimerState.idle => 'Start Session',
     };
 
-    final icon = switch (state) {
+    final icon = switch (widget.state) {
       TimerState.running => Icons.pause_rounded,
       TimerState.paused => Icons.play_arrow_rounded,
       TimerState.completed => Icons.check_circle_outline,
       TimerState.idle => Icons.play_arrow_rounded,
     };
 
-    return AnimatedContainer(
-      duration: 300.ms,
-      width: double.infinity,
-      height: 56,
-      decoration: BoxDecoration(
-        gradient: isCompleted
-            ? LinearGradient(
-                colors: [AppColors.success.withValues(alpha: 0.8), AppColors.success],
-              )
-            : isPaused
-                ? LinearGradient(
-                    colors: [
-                      const Color(0xFF60A5FA).withValues(alpha: 0.8),
-                      const Color(0xFF3B82F6),
-                    ],
-                  )
-                : AppColors.accentGradient,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-        boxShadow: [
-          BoxShadow(
-            color: (isCompleted
-                    ? AppColors.success
-                    : isPaused
-                        ? const Color(0xFF3B82F6)
-                        : AppColors.accent)
-                .withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isCompleted
-              ? null
-              : (state == TimerState.idle
-                  ? onStart
-                  : (state == TimerState.paused ? onResume : onPause)),
+    final primaryColor = isCompleted
+        ? AppColors.success
+        : isPaused
+            ? const Color(0xFF3B82F6)
+            : AppColors.accent;
+
+    return ScaleTransition(
+      scale: _scaleAnim,
+      child: AnimatedContainer(
+        duration: 300.ms,
+        width: double.infinity,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: isCompleted
+              ? LinearGradient(
+                  colors: [
+                    AppColors.success.withValues(alpha: 0.8),
+                    AppColors.success
+                  ],
+                )
+              : isPaused
+                  ? LinearGradient(
+                      colors: [
+                        const Color(0xFF60A5FA).withValues(alpha: 0.8),
+                        const Color(0xFF3B82F6),
+                      ],
+                    )
+                  : AppColors.accentGradient,
           borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-          splashColor: Colors.white.withValues(alpha: 0.15),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: AppColors.background, size: 22),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.background,
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withValues(alpha: 0.35),
+              blurRadius: 22,
+              offset: const Offset(0, 6),
+            ),
+            BoxShadow(
+              color: primaryColor.withValues(alpha: 0.12),
+              blurRadius: 40,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTapDown: isCompleted ? null : (_) => _pressCtrl.forward(),
+            onTapUp: isCompleted
+                ? null
+                : (_) {
+                    _pressCtrl.reverse();
+                    final action = widget.state == TimerState.idle
+                        ? widget.onStart
+                        : (widget.state == TimerState.paused
+                            ? widget.onResume
+                            : widget.onPause);
+                    action();
+                  },
+            onTapCancel: isCompleted ? null : () => _pressCtrl.reverse(),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+            splashColor: Colors.white.withValues(alpha: 0.15),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: AppColors.background, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.background,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -155,10 +207,9 @@ class _ResetButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.secondaryText,
           side: BorderSide(
-              color: AppColors.muted.withValues(alpha: 0.5), width: 1),
+              color: AppColors.muted.withValues(alpha: 0.4), width: 1),
           shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(AppDimensions.radiusFull),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
           ),
           textStyle: const TextStyle(
             fontSize: 14,

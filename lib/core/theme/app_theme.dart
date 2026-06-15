@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 
 abstract final class AppTheme {
-  static ThemeData get dark {
-    final base = ThemeData.dark(useMaterial3: true);
+  static ThemeData get light {
+    final base = ThemeData.light(useMaterial3: true);
 
     final textTheme = GoogleFonts.interTextTheme(base.textTheme).copyWith(
       // Display Large → timer clock face (overridden locally in painter)
@@ -60,15 +60,18 @@ abstract final class AppTheme {
 
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        brightness: Brightness.dark,
+      // Material 3 sparkle ripple effect for all InkWell / buttons
+      splashFactory: InkSparkle.splashFactory,
+      colorScheme: const ColorScheme.light(
         primary: AppColors.accent,
-        onPrimary: AppColors.background,
-        secondary: AppColors.accentDark,
-        onSecondary: AppColors.background,
+        secondary: AppColors.teal,
+        tertiary: AppColors.teal,
         surface: AppColors.surface,
-        onSurface: AppColors.primaryText,
         error: AppColors.error,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: AppColors.primaryText,
+        brightness: Brightness.light,
       ),
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
@@ -90,21 +93,39 @@ abstract final class AppTheme {
           color: AppColors.muted,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.muted, width: 1),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: AppColors.muted.withValues(alpha: 0.4), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.background,
         selectedItemColor: AppColors.accent,
         unselectedItemColor: AppColors.muted,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        modalElevation: 0,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      // Smooth page transitions
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+        },
       ),
     );
   }

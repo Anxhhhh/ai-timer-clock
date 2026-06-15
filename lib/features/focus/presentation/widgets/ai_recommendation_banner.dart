@@ -24,7 +24,7 @@ class AiRecommendationBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     return GlassCard(
-      borderColor: const Color(0xFF8B5CF6).withValues(alpha: 0.5),
+      gradientBorder: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -33,10 +33,14 @@ class AiRecommendationBanner extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8B5CF6), Color(0xFF3B82F6)],
-                  ),
+                  gradient: AppColors.geminiGradient,
                   borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.25),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
                 child: const Icon(Icons.auto_awesome,
                     size: 14, color: Colors.white),
@@ -54,12 +58,19 @@ class AiRecommendationBanner extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: onDismiss,
-                child: const Icon(Icons.close,
-                    size: 16, color: AppColors.muted),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.muted.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(Icons.close,
+                      size: 14, color: AppColors.muted),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           // Task
           Text(
             recommendation.taskDescription,
@@ -70,7 +81,7 @@ class AiRecommendationBanner extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           // Duration
           Row(
             children: [
@@ -87,7 +98,7 @@ class AiRecommendationBanner extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             recommendation.reason,
             style: tt.bodyMedium?.copyWith(
@@ -96,7 +107,7 @@ class AiRecommendationBanner extends StatelessWidget {
               color: AppColors.secondaryText,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           // Action buttons
           Row(
             children: [
@@ -145,8 +156,9 @@ class _ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 9),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
           color: isPrimary
               ? AppColors.accent.withValues(alpha: 0.15)
@@ -155,23 +167,35 @@ class _ActionButton extends StatelessWidget {
               BorderRadius.circular(AppDimensions.radiusFull),
           border: Border.all(
             color: isPrimary
-                ? AppColors.accent.withValues(alpha: 0.6)
-                : AppColors.muted.withValues(alpha: 0.4),
+                ? AppColors.accent.withValues(alpha: 0.5)
+                : AppColors.muted.withValues(alpha: 0.3),
           ),
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: AppColors.accent.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                  )
+                ]
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon,
                 size: 14,
-                color: isPrimary ? AppColors.accent : AppColors.secondaryText),
+                color: isPrimary
+                    ? AppColors.accent
+                    : AppColors.secondaryText),
             const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isPrimary ? AppColors.accent : AppColors.secondaryText,
+                color: isPrimary
+                    ? AppColors.accent
+                    : AppColors.secondaryText,
               ),
             ),
           ],
